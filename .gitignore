@@ -1,0 +1,14 @@
+node_modules/
+coverage/
+.env
+*.log
+dist/
+.DS_Store
+Thumbs.db
+
+# Arquivos antigos (pré-reestruturação) — mantidos localmente, ignorados pelo git
+/app.js
+/index.html
+/providers.js
+/style.css
+/langflow-mentor.html

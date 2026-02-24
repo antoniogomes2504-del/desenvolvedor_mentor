@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Mentor IA para Langflow — Assistente com visão de tela em tempo real para aprender Langflow com IA." />
+    <meta name="theme-color" content="#0f1117" />
+    <title>Mentor IA — Langflow</title>
+    <link rel="stylesheet" href="assets/style.css" />
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- HEADER                                                     -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <header class="header">
+        <div class="header__logo">🤖</div>
+        <div>
+            <h1 class="header__title">Mentor IA — Langflow</h1>
+            <p class="header__subtitle">Assistente com visão de tela em tempo real</p>
+        </div>
+        <div class="header__right">
+            <div class="provider-pill" id="active-provider-pill" style="display:none">
+                <span id="active-provider-icon"></span>
+                <span id="active-provider-name"></span>
+            </div>
+            <div class="status-badge">
+                <div class="status-dot" id="status-dot"></div>
+                <span id="status-text">Aguardando configuração</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- TELA DE CONFIGURAÇÃO (SETUP)                               -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="setup" id="setup-screen">
+        <div class="setup__card">
+            <div class="setup__icon">🧠</div>
+            <h2 class="setup__heading">Configure seu Mentor IA</h2>
+            <p class="setup__sub">
+                Escolha o modelo de IA, insira sua chave e comece a aprender
+                Langflow com um mentor ao vivo.
+            </p>
+
+            <div class="section-label">1. Escolha o provedor de IA</div>
+            <div class="provider-grid" id="provider-grid">
+                <!-- Cards gerados dinamicamente por app.js -->
+            </div>
+
+            <div class="input-group">
+                <label class="input-group__label">2. Modelo</label>
+                <select id="model-select"></select>
+            </div>
+
+            <div class="input-group">
+                <label class="input-group__label" id="key-label">3. Chave de API — Google Gemini</label>
+                <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off" />
+                <div class="key-hint" id="key-hint">
+                    Obtenha em: <a href="https://aistudio.google.com/apikey" target="_blank"
+                        rel="noopener">aistudio.google.com/apikey</a>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-group__label">4. Contexto sobre você (opcional)</label>
+                <input type="text" id="context-input"
+                    placeholder="Ex: Sou iniciante em Langflow, uso ambiente corporativo..." />
+            </div>
+
+            <button class="btn-primary" id="btn-start">🚀 Iniciar Mentor IA</button>
+            <p class="setup__hint">🔒 Sua chave fica apenas no navegador e nunca é salva em nenhum servidor.</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- INTERFACE PRINCIPAL (APP)                                   -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="app" id="app-screen">
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="btn-tool" id="btn-share-screen">🖥️ Compartilhar Tela</button>
+            <button class="btn-tool danger" id="btn-stop-screen" style="display:none">⏹ Parar Captura</button>
+            <div class="toolbar__sep"></div>
+            <button class="btn-tool danger" id="btn-clear">🗑 Limpar chat</button>
+            <button class="btn-tool" id="btn-change-provider">⚙️ Trocar modelo</button>
+        </div>
+
+        <!-- Content: Tela + Chat -->
+        <div class="content">
+
+            <!-- Painel da Tela (55%) -->
+            <div class="screen-panel">
+                <div class="panel-header">📺 Sua tela ao vivo</div>
+                <div class="screen-container">
+                    <video id="screen-video" autoplay muted playsinline></video>
+                    <div class="screen-placeholder" id="screen-placeholder">
+                        <div class="screen-placeholder__icon">🖥️</div>
+                        <p>Clique em <strong>"Compartilhar Tela"</strong><br>para o mentor ver sua tela</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel do Chat (45%) -->
+            <div class="chat-panel">
+                <div class="panel-header" id="chat-panel-header">💬 Chat com o Mentor</div>
+
+                <div class="messages" id="messages">
+                    <div class="welcome">
+                        <div class="welcome__icon">👋</div>
+                        <h3>Olá! Sou seu Mentor de Langflow</h3>
+                        <p>Compartilhe sua tela e me faça qualquer pergunta.<br>
+                            Vejo o que você está fazendo e te oriento passo a passo.</p>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <div id="no-vision-warn" class="vision-warn" style="display:none">
+                        ⚠️ Este modelo não suporta visão. O chat funciona, mas o mentor não verá sua tela.
+                        Use Gemini, GPT-4o ou Claude para visão de tela.
+                    </div>
+                    <div class="input-row">
+                        <textarea class="chat-input" id="chat-input"
+                            placeholder="Digite sua pergunta... (Enter para enviar)" rows="1"></textarea>
+                        <button class="btn-send" id="btn-send">➤</button>
+                    </div>
+                    <div class="input-footer">
+                        <label>
+                            <input type="checkbox" id="auto-capture" checked>
+                            Capturar tela ao enviar
+                        </label>
+                        <span>·</span>
+                        <span>Shift+Enter = nova linha</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Canvas oculto para captura de frames -->
+    <canvas id="capture-canvas"></canvas>
+
+    <!-- Scripts -->
+    <script src="js/providers.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

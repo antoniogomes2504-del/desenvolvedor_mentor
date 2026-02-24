@@ -1,0 +1,33 @@
+{
+    "name": "desenvolvedor-mentor",
+    "version": "1.0.0",
+    "description": "Mentor IA para Langflow — Assistente com visão de tela em tempo real",
+    "scripts": {
+        "test": "jest --coverage",
+        "test:watch": "jest --watch",
+        "test:ci": "jest --coverage --ci --reporters=default"
+    },
+    "devDependencies": {
+        "jest": "^29.0.0",
+        "jest-environment-jsdom": "^29.0.0",
+        "@jest/globals": "^29.0.0"
+    },
+    "jest": {
+        "testEnvironment": "jsdom",
+        "collectCoverageFrom": [
+            "src/js/**/*.js"
+        ],
+        "coverageThreshold": {
+            "global": {
+                "lines": 60,
+                "functions": 55
+            }
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/antoniogomes2504-del/desenvolvedor_mentor.git"
+    },
+    "author": "Antonio Gomes",
+    "license": "MIT"
+}
