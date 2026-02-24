@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Testes com Jest
+    name: Validação + Testes
     runs-on: ubuntu-latest
 
     steps:
@@ -23,6 +23,9 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci
+
+      - name: Validar estrutura do projeto
+        run: npm run validate
 
       - name: Rodar testes com cobertura
         run: npm run test:ci

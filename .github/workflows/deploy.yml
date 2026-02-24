@@ -15,10 +15,10 @@ concurrency:
 
 jobs:
   # ──────────────────────────────────────────────
-  # Job 1: Rodar testes antes do deploy
+  # Job 1: Validar + testar antes do deploy
   # ──────────────────────────────────────────────
   test:
-    name: Testes antes do deploy
+    name: Validação + Testes antes do deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do código
@@ -32,6 +32,9 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci
+
+      - name: Validar estrutura do projeto
+        run: npm run validate
 
       - name: Rodar testes (bloqueia deploy se falhar)
         run: npm run test:ci

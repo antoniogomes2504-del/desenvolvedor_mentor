@@ -5,7 +5,9 @@
     "scripts": {
         "test": "jest --coverage",
         "test:watch": "jest --watch",
-        "test:ci": "jest --coverage --ci --reporters=default"
+        "test:ci": "jest --coverage --ci --reporters=default",
+        "validate": "node scripts/validate-structure.js",
+        "precommit": "npm run validate && npm test"
     },
     "devDependencies": {
         "jest": "^29.0.0",
