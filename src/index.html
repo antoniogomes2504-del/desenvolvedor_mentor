@@ -23,6 +23,10 @@
             <p class="header__subtitle">Assistente com visão de tela em tempo real</p>
         </div>
         <div class="header__right">
+            <div class="profile-pill" id="active-profile-pill" style="display:none">
+                <span id="active-profile-icon"></span>
+                <span id="active-profile-name"></span>
+            </div>
             <div class="provider-pill" id="active-provider-pill" style="display:none">
                 <span id="active-provider-icon"></span>
                 <span id="active-provider-name"></span>
@@ -46,18 +50,28 @@
                 Langflow com um mentor ao vivo.
             </p>
 
-            <div class="section-label">1. Escolha o provedor de IA</div>
+            <div class="section-label">1. Escolha seu Especialista</div>
+            <div class="profile-grid" id="profile-grid">
+                <!-- Cards gerados dinamicamente por app.js -->
+            </div>
+            <div class="custom-prompt-area" id="custom-prompt-area" style="display:none">
+                <label class="input-group__label">Descreva seu especialista</label>
+                <textarea id="custom-prompt-input" rows="3"
+                    placeholder="Ex: Você é um especialista em automação industrial com foco em PLCs Siemens..."></textarea>
+            </div>
+
+            <div class="section-label">2. Escolha o provedor de IA</div>
             <div class="provider-grid" id="provider-grid">
                 <!-- Cards gerados dinamicamente por app.js -->
             </div>
 
             <div class="input-group">
-                <label class="input-group__label">2. Modelo</label>
+                <label class="input-group__label">3. Modelo</label>
                 <select id="model-select"></select>
             </div>
 
             <div class="input-group">
-                <label class="input-group__label" id="key-label">3. Chave de API — Google Gemini</label>
+                <label class="input-group__label" id="key-label">4. Chave de API — Google Gemini</label>
                 <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off" />
                 <div class="key-hint" id="key-hint">
                     Obtenha em: <a href="https://aistudio.google.com/apikey" target="_blank"
@@ -66,7 +80,7 @@
             </div>
 
             <div class="input-group">
-                <label class="input-group__label">4. Contexto sobre você (opcional)</label>
+                <label class="input-group__label">5. Contexto sobre você (opcional)</label>
                 <input type="text" id="context-input"
                     placeholder="Ex: Sou iniciante em Langflow, uso ambiente corporativo..." />
             </div>
@@ -147,6 +161,7 @@
 
     <!-- Scripts -->
     <script src="js/providers.js"></script>
+    <script src="js/profiles.js"></script>
     <script src="js/app.js"></script>
 </body>
 

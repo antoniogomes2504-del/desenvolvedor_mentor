@@ -11,6 +11,8 @@ let userContext = '';
 let mediaStream = null;
 let conversationHistory = [];
 let isProcessing = false;
+let selectedProfile = 'langflow';
+let activeSystemPrompt = (typeof SYSTEM_PROMPT !== 'undefined') ? SYSTEM_PROMPT : '';
 
 // ── ELEMENTOS ─────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -42,6 +44,85 @@ const activePill = $('active-provider-pill');
 const activePillIcon = $('active-provider-icon');
 const activePillName = $('active-provider-name');
 const chatPanelHdr = $('chat-panel-header');
+// Elementos de perfil (pode ser null em testes antigos sem PROFILES)
+const profileGrid = $('profile-grid');
+const customPromptArea = $('custom-prompt-area');
+const customPromptInput = $('custom-prompt-input');
+const activeProfilePill = $('active-profile-pill');
+const activeProfileIcon = $('active-profile-icon');
+const activeProfileName = $('active-profile-name');
+
+// ═══════════════════════════════════════════════════════════════
+// SETUP — GERAÇÃO DINÂMICA DOS CARDS DE PERFIL
+// ═══════════════════════════════════════════════════════════════
+function selectProfile(profileId) {
+    if (typeof PROFILES === 'undefined') return;
+    const profile = PROFILES.find(p => p.id === profileId);
+    if (!profile) return;
+
+    selectedProfile = profileId;
+    try { localStorage.setItem('mentor_profile', profileId); } catch (_) { /* ignore */ }
+
+    // Atualizar prompt ativo
+    if (profile.id === 'custom') {
+        const customText = customPromptInput ? customPromptInput.value.trim() : '';
+        activeSystemPrompt = customText || (typeof SYSTEM_PROMPT !== 'undefined' ? SYSTEM_PROMPT : '');
+    } else {
+        activeSystemPrompt = profile.systemPrompt;
+    }
+
+    // Mostrar/esconder textarea de prompt customizado
+    if (customPromptArea) {
+        customPromptArea.style.display = profile.id === 'custom' ? 'block' : 'none';
+    }
+
+    // Atualizar visual dos cards
+    if (profileGrid) {
+        profileGrid.querySelectorAll('.profile-card').forEach(c => c.classList.remove('selected'));
+        const sel = profileGrid.querySelector(`[data-profile="${profileId}"]`);
+        if (sel) sel.classList.add('selected');
+    }
+}
+
+function renderProfileGrid() {
+    if (!profileGrid || typeof PROFILES === 'undefined') return;
+    profileGrid.innerHTML = '';
+
+    // Recuperar perfil salvo
+    try {
+        const saved = localStorage.getItem('mentor_profile');
+        if (saved && PROFILES.find(p => p.id === saved)) selectedProfile = saved;
+    } catch (_) { /* ignore */ }
+
+    PROFILES.forEach(p => {
+        const card = document.createElement('div');
+        card.className = `profile-card${p.id === selectedProfile ? ' selected' : ''}`;
+        card.dataset.profile = p.id;
+
+        card.innerHTML = `
+      <div class="profile-card__icon">${p.icon}</div>
+      <div class="profile-card__info">
+        <div class="profile-card__name">${p.name}</div>
+        <div class="profile-card__desc">${p.desc}</div>
+      </div>
+    `;
+
+        card.addEventListener('click', () => selectProfile(p.id));
+        profileGrid.appendChild(card);
+    });
+
+    // Selecionar o perfil padrão/salvo
+    selectProfile(selectedProfile);
+
+    // Listener do textarea customizado
+    if (customPromptInput) {
+        customPromptInput.addEventListener('input', () => {
+            if (selectedProfile === 'custom') {
+                activeSystemPrompt = customPromptInput.value.trim() || (typeof SYSTEM_PROMPT !== 'undefined' ? SYSTEM_PROMPT : '');
+            }
+        });
+    }
+}
 
 // ═══════════════════════════════════════════════════════════════
 // SETUP — GERAÇÃO DINÂMICA DOS CARDS DE PROVEDOR
@@ -93,6 +174,7 @@ function updateSetupUI() {
 }
 
 // Inicializar
+renderProfileGrid();
 renderProviderGrid();
 updateSetupUI();
 
@@ -116,13 +198,25 @@ btnStart.addEventListener('click', () => {
     appScreen.classList.add('visible');
     setStatus('active', 'Pronto para ajudar');
 
-    // Atualizar header
+    // Atualizar header — provedor
     const p = PROVIDERS[selectedProvider];
     activePillIcon.textContent = p.icon;
     const modelLabel = p.models.find(m => m.id === selectedModel)?.label || selectedModel;
     activePillName.textContent = `${p.name} · ${modelLabel}`;
     activePill.style.display = 'flex';
-    chatPanelHdr.textContent = `💬 Chat · ${p.name}`;
+
+    // Header — perfil
+    const profileObj = (typeof PROFILES !== 'undefined') ? PROFILES.find(pr => pr.id === selectedProfile) : null;
+    const profileLabel = profileObj ? profileObj.name : '';
+    if (activeProfilePill && profileObj) {
+        activeProfileIcon.textContent = profileObj.icon;
+        activeProfileName.textContent = profileObj.name;
+        activeProfilePill.style.display = 'flex';
+    }
+
+    chatPanelHdr.textContent = profileLabel
+        ? `💬 Chat · ${profileLabel} · ${p.name}`
+        : `💬 Chat · ${p.name}`;
 
     // Visão
     const supportsVision = p.supportsVision;
@@ -332,7 +426,7 @@ async function callProvider() {
 async function callGemini() {
     const url = `${PROVIDERS.gemini.endpoint(selectedModel)}?key=${apiKey}`;
     const body = {
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        system_instruction: { parts: [{ text: activeSystemPrompt }] },
         contents: conversationHistory,
         generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
     };
@@ -361,7 +455,7 @@ async function callOpenAICompat(endpoint) {
     });
     const body = {
         model: selectedModel,
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...msgs],
+        messages: [{ role: 'system', content: activeSystemPrompt }, ...msgs],
         max_tokens: 2048,
         temperature: 0.7,
     };
@@ -385,7 +479,7 @@ async function callClaude() {
     const body = {
         model: selectedModel,
         max_tokens: 2048,
-        system: SYSTEM_PROMPT,
+        system: activeSystemPrompt,
         messages: conversationHistory,
     };
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -534,10 +628,14 @@ if (typeof module !== 'undefined' && module.exports) {
         callGemini,
         callOpenAICompat,
         callClaude,
+        // Perfis
+        selectProfile,
+        renderProfileGrid,
         // Acesso ao estado interno (para testes)
         getState: () => ({
             selectedProvider, apiKey, selectedModel,
             userContext, mediaStream, conversationHistory, isProcessing,
+            selectedProfile, activeSystemPrompt,
         }),
         setState: (patch) => {
             if ('selectedProvider' in patch) selectedProvider = patch.selectedProvider;
@@ -547,6 +645,8 @@ if (typeof module !== 'undefined' && module.exports) {
             if ('mediaStream' in patch) mediaStream = patch.mediaStream;
             if ('conversationHistory' in patch) conversationHistory = patch.conversationHistory;
             if ('isProcessing' in patch) isProcessing = patch.isProcessing;
+            if ('selectedProfile' in patch) selectedProfile = patch.selectedProfile;
+            if ('activeSystemPrompt' in patch) activeSystemPrompt = patch.activeSystemPrompt;
         },
     };
 }
