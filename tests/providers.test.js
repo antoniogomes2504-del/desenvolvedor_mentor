@@ -69,8 +69,8 @@ describe('PROVIDERS — Configuração dos Provedores de IA', () => {
     });
 
     describe('Modelos padrão de cada provedor', () => {
-        test('Gemini tem gemini-2.0-flash como primeiro modelo', () => {
-            expect(PROVIDERS.gemini.models[0].id).toBe('gemini-2.0-flash');
+        test('Gemini tem gemini-2.5-flash como primeiro modelo', () => {
+            expect(PROVIDERS.gemini.models[0].id).toBe('gemini-2.5-flash');
         });
         test('OpenAI tem gpt-4o como primeiro modelo', () => {
             expect(PROVIDERS.openai.models[0].id).toBe('gpt-4o');
@@ -91,9 +91,9 @@ describe('PROVIDERS — Configuração dos Provedores de IA', () => {
 
     describe('Endpoints dos provedores', () => {
         test('Gemini gera URL correta com modelo', () => {
-            const url = PROVIDERS.gemini.endpoint('gemini-2.0-flash');
+            const url = PROVIDERS.gemini.endpoint('gemini-2.5-flash');
             expect(url).toContain('generativelanguage.googleapis.com');
-            expect(url).toContain('gemini-2.0-flash');
+            expect(url).toContain('gemini-2.5-flash');
         });
         test('OpenAI retorna endpoint correto', () => {
             expect(PROVIDERS.openai.endpoint()).toContain('api.openai.com');

@@ -9,13 +9,14 @@ const PROVIDERS = {
         icon: '🟢',
         iconBg: '#0d2b1d',
         supportsVision: true,
-        keyLabel: '3. Chave de API — Google Gemini',
+        keyLabel: '4. Chave de API — Google Gemini',
         keyHint: 'Obtenha em: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>',
         keyPlaceholder: 'AIza...',
         models: [
-            { id: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
-            { id: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
-            { id: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
+            { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+            { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
+            { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash-Lite' },
+            { id: 'gemini-3-flash-preview', label: 'Gemini 3 Flash (Preview)' },
         ],
         endpoint: model =>
             `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
@@ -26,7 +27,7 @@ const PROVIDERS = {
         icon: '🤍',
         iconBg: '#1a1a1a',
         supportsVision: true,
-        keyLabel: '3. Chave de API — OpenAI',
+        keyLabel: '4. Chave de API — OpenAI',
         keyHint: 'Obtenha em: <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>',
         keyPlaceholder: 'sk-...',
         models: [
@@ -42,7 +43,7 @@ const PROVIDERS = {
         icon: '🟠',
         iconBg: '#2a1a0a',
         supportsVision: true,
-        keyLabel: '3. Chave de API — Anthropic',
+        keyLabel: '4. Chave de API — Anthropic',
         keyHint: 'Obtenha em: <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>',
         keyPlaceholder: 'sk-ant-...',
         models: [
@@ -58,7 +59,7 @@ const PROVIDERS = {
         icon: '🔵',
         iconBg: '#0a1a2a',
         supportsVision: false,
-        keyLabel: '3. Chave de API — DeepSeek',
+        keyLabel: '4. Chave de API — DeepSeek',
         keyHint: 'Obtenha em: <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">platform.deepseek.com</a>',
         keyPlaceholder: 'sk-...',
         models: [
@@ -73,7 +74,7 @@ const PROVIDERS = {
         icon: '🟣',
         iconBg: '#1a0a2a',
         supportsVision: false,
-        keyLabel: '3. Chave de API — Mistral',
+        keyLabel: '4. Chave de API — Mistral',
         keyHint: 'Obtenha em: <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">console.mistral.ai</a>',
         keyPlaceholder: 'Chave Mistral...',
         models: [
@@ -89,7 +90,7 @@ const PROVIDERS = {
         icon: '⚡',
         iconBg: '#1a1a0a',
         supportsVision: false,
-        keyLabel: '3. Chave de API — Groq',
+        keyLabel: '4. Chave de API — Groq',
         keyHint: 'Obtenha em: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com</a>',
         keyPlaceholder: 'gsk_...',
         models: [

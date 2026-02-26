@@ -85,7 +85,7 @@ describe('callGemini()', () => {
         app.setState({
             selectedProvider: 'gemini',
             apiKey: 'test-gemini-key',
-            selectedModel: 'gemini-2.0-flash',
+            selectedModel: 'gemini-2.5-flash',
             conversationHistory: [
                 { role: 'user', parts: [{ text: 'Olá' }] },
             ],
@@ -100,7 +100,7 @@ describe('callGemini()', () => {
         await app.callGemini();
 
         const url = global.fetch.mock.calls[0][0];
-        expect(url).toContain('gemini-2.0-flash');
+        expect(url).toContain('gemini-2.5-flash');
         expect(url).toContain('key=test-gemini-key');
         expect(url).toContain('generativelanguage.googleapis.com');
     });
@@ -362,7 +362,7 @@ describe('callProvider()', () => {
         app.setState({
             selectedProvider: 'gemini',
             apiKey: 'key',
-            selectedModel: 'gemini-2.0-flash',
+            selectedModel: 'gemini-2.5-flash',
             conversationHistory: [],
         });
 
