@@ -128,13 +128,15 @@ describe('callGemini()', () => {
         expect(body.contents[0].parts[0].text).toBe('Olá');
     });
 
-    test('retorna texto da resposta', async () => {
+    test('retorna objeto com texto e uso', async () => {
         mockFetchSuccess({
             candidates: [{ content: { parts: [{ text: 'Resposta do Gemini' }] } }],
+            usageMetadata: { totalTokenCount: 123 }
         });
 
-        const result = await app.callGemini();
-        expect(result).toBe('Resposta do Gemini');
+        const { text, usage } = await app.callGemini();
+        expect(text).toBe('Resposta do Gemini');
+        expect(usage).toBe(123);
     });
 
     test('lança erro quando res.ok = false', async () => {
@@ -193,13 +195,15 @@ describe('callOpenAICompat()', () => {
         expect(body.model).toBe('gpt-4o');
     });
 
-    test('retorna texto da resposta', async () => {
+    test('retorna objeto com texto e uso', async () => {
         mockFetchSuccess({
             choices: [{ message: { content: 'Olá do GPT!' } }],
+            usage: { total_tokens: 456 }
         });
 
-        const result = await app.callOpenAICompat('https://api.openai.com/v1/chat/completions');
-        expect(result).toBe('Olá do GPT!');
+        const { text, usage } = await app.callOpenAICompat('https://api.openai.com/v1/chat/completions');
+        expect(text).toBe('Olá do GPT!');
+        expect(usage).toBe(456);
     });
 
     test('lança erro quando res.ok = false', async () => {
@@ -327,13 +331,15 @@ describe('callClaude()', () => {
         expect(sysMsg).toBeUndefined();
     });
 
-    test('retorna texto da resposta', async () => {
+    test('retorna objeto com texto e uso', async () => {
         mockFetchSuccess({
             content: [{ text: 'Resposta do Claude' }],
+            usage: { input_tokens: 10, output_tokens: 20 }
         });
 
-        const result = await app.callClaude();
-        expect(result).toBe('Resposta do Claude');
+        const { text, usage } = await app.callClaude();
+        expect(text).toBe('Resposta do Claude');
+        expect(usage).toBe(30);
     });
 
     test('lança erro quando res.ok = false', async () => {
@@ -368,10 +374,12 @@ describe('callProvider()', () => {
 
         mockFetchSuccess({
             candidates: [{ content: { parts: [{ text: 'OK' }] } }],
+            usageMetadata: { totalTokenCount: 10 }
         });
 
-        const result = await app.callProvider();
-        expect(result).toBe('OK');
+        const { text, usage } = await app.callProvider();
+        expect(text).toBe('OK');
+        expect(usage).toBe(10);
         expect(global.fetch.mock.calls[0][0]).toContain('googleapis.com');
     });
 

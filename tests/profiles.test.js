@@ -73,12 +73,12 @@ afterEach(() => {
 // ═══════════════════════════════════════════════════════════════
 describe('PROFILES — estrutura', () => {
 
-    test('PROFILES é um array com 8 perfis', () => {
+    test('PROFILES é um array com 9 perfis', () => {
         expect(Array.isArray(PROFILES)).toBe(true);
-        expect(PROFILES).toHaveLength(8);
+        expect(PROFILES).toHaveLength(9);
     });
 
-    const expectedIds = ['langflow', 'python', 'frontend', 'devops', 'database', 'ml', 'security', 'custom'];
+    const expectedIds = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database', 'custom'];
 
     test.each(expectedIds)('perfil "%s" existe no array', (id) => {
         const found = PROFILES.find(p => p.id === id);
@@ -128,7 +128,7 @@ describe('PROFILES — estrutura', () => {
 // ═══════════════════════════════════════════════════════════════
 describe('PROFILES — systemPrompt', () => {
 
-    const profilesComPrompt = ['langflow', 'python', 'frontend', 'devops', 'database', 'ml', 'security'];
+    const profilesComPrompt = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database'];
 
     test.each(profilesComPrompt)('perfil "%s" tem systemPrompt não-nulo', (id) => {
         const profile = PROFILES.find(p => p.id === id);
@@ -155,11 +155,6 @@ describe('PROFILES — systemPrompt', () => {
     test('perfil "python" menciona Python no systemPrompt', () => {
         const profile = PROFILES.find(p => p.id === 'python');
         expect(profile.systemPrompt).toMatch(/python/i);
-    });
-
-    test('perfil "security" menciona OWASP no systemPrompt', () => {
-        const profile = PROFILES.find(p => p.id === 'security');
-        expect(profile.systemPrompt).toMatch(/OWASP/i);
     });
 });
 
@@ -201,11 +196,11 @@ describe('selectProfile()', () => {
         app.selectProfile('python');
         const pythonPrompt = app.getState().activeSystemPrompt;
 
-        app.selectProfile('security');
-        const securityPrompt = app.getState().activeSystemPrompt;
+        app.selectProfile('database');
+        const dbPrompt = app.getState().activeSystemPrompt;
 
-        expect(pythonPrompt).not.toBe(securityPrompt);
-        expect(securityPrompt).toBe(PROFILES.find(p => p.id === 'security').systemPrompt);
+        expect(pythonPrompt).not.toBe(dbPrompt);
+        expect(dbPrompt).toBe(PROFILES.find(p => p.id === 'database').systemPrompt);
     });
 
     test('selecionar perfil "custom" sem texto no textarea usa SYSTEM_PROMPT fallback', () => {
@@ -231,14 +226,13 @@ describe('localStorage — persistência de perfil', () => {
         app.selectProfile('python');
         expect(localStorage.getItem('mentor_profile')).toBe('python');
 
-        app.selectProfile('ml');
-        expect(localStorage.getItem('mentor_profile')).toBe('ml');
+        app.selectProfile('qa');
+        expect(localStorage.getItem('mentor_profile')).toBe('qa');
     });
 
     test('na inicialização, recupera perfil salvo do localStorage', () => {
-        // Limpa e reconfigura com perfil salvo
         jest.resetModules();
-        localStorage.setItem('mentor_profile', 'security');
+        localStorage.setItem('mentor_profile', 'database');
         setupDOM();
         HTMLCanvasElement.prototype.getContext = jest.fn(() => ({ drawImage: jest.fn() }));
         HTMLCanvasElement.prototype.toDataURL = jest.fn(() => 'data:image/jpeg;base64,mock');
@@ -248,8 +242,8 @@ describe('localStorage — persistência de perfil', () => {
 
         const freshApp = require('../src/js/app');
         const state = freshApp.getState();
-        expect(state.selectedProfile).toBe('security');
-        expect(state.activeSystemPrompt).toBe(PROFILES.find(p => p.id === 'security').systemPrompt);
+        expect(state.selectedProfile).toBe('database');
+        expect(state.activeSystemPrompt).toBe(PROFILES.find(p => p.id === 'database').systemPrompt);
     });
 
     test('perfil inválido no localStorage cai no padrão "langflow"', () => {
@@ -269,7 +263,6 @@ describe('localStorage — persistência de perfil', () => {
 
     test('NÃO salva apiKey no localStorage', () => {
         app.setState({ apiKey: 'chave-secreta-123' });
-        // Verifica que não existe nenhuma chave de API no localStorage
         const allKeys = Object.keys(localStorage);
         allKeys.forEach(key => {
             expect(localStorage.getItem(key)).not.toBe('chave-secreta-123');
@@ -282,10 +275,10 @@ describe('localStorage — persistência de perfil', () => {
 // ═══════════════════════════════════════════════════════════════
 describe('renderProfileGrid()', () => {
 
-    test('gera 8 cards de perfil no grid', () => {
+    test('gera 9 cards de perfil no grid', () => {
         const grid = document.getElementById('profile-grid');
         const cards = grid.querySelectorAll('.profile-card');
-        expect(cards.length).toBe(8);
+        expect(cards.length).toBe(9);
     });
 
     test('card selecionado por padrão tem classe "selected"', () => {
@@ -296,7 +289,7 @@ describe('renderProfileGrid()', () => {
 
     test('cada card tem data-profile com id correto', () => {
         const grid = document.getElementById('profile-grid');
-        const expectedIds = ['langflow', 'python', 'frontend', 'devops', 'database', 'ml', 'security', 'custom'];
+        const expectedIds = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database', 'custom'];
         expectedIds.forEach(id => {
             const card = grid.querySelector(`[data-profile="${id}"]`);
             expect(card).not.toBeNull();
