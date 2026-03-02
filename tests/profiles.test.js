@@ -73,12 +73,12 @@ afterEach(() => {
 // ═══════════════════════════════════════════════════════════════
 describe('PROFILES — estrutura', () => {
 
-    test('PROFILES é um array com 9 perfis', () => {
+    test('PROFILES é um array com 10 perfis', () => {
         expect(Array.isArray(PROFILES)).toBe(true);
-        expect(PROFILES).toHaveLength(9);
+        expect(PROFILES).toHaveLength(10);
     });
 
-    const expectedIds = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database', 'custom'];
+    const expectedIds = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database', 'dify', 'custom'];
 
     test.each(expectedIds)('perfil "%s" existe no array', (id) => {
         const found = PROFILES.find(p => p.id === id);
@@ -128,7 +128,7 @@ describe('PROFILES — estrutura', () => {
 // ═══════════════════════════════════════════════════════════════
 describe('PROFILES — systemPrompt', () => {
 
-    const profilesComPrompt = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database'];
+    const profilesComPrompt = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database', 'dify'];
 
     test.each(profilesComPrompt)('perfil "%s" tem systemPrompt não-nulo', (id) => {
         const profile = PROFILES.find(p => p.id === id);
@@ -275,10 +275,10 @@ describe('localStorage — persistência de perfil', () => {
 // ═══════════════════════════════════════════════════════════════
 describe('renderProfileGrid()', () => {
 
-    test('gera 9 cards de perfil no grid', () => {
+    test('gera 10 cards de perfil no grid', () => {
         const grid = document.getElementById('profile-grid');
         const cards = grid.querySelectorAll('.profile-card');
-        expect(cards.length).toBe(9);
+        expect(cards.length).toBe(10);
     });
 
     test('card selecionado por padrão tem classe "selected"', () => {
@@ -289,7 +289,7 @@ describe('renderProfileGrid()', () => {
 
     test('cada card tem data-profile com id correto', () => {
         const grid = document.getElementById('profile-grid');
-        const expectedIds = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database', 'custom'];
+        const expectedIds = ['langflow', 'architect', 'python', 'qa', 'frontend', 'uxui', 'devops', 'database', 'dify', 'custom'];
         expectedIds.forEach(id => {
             const card = grid.querySelector(`[data-profile="${id}"]`);
             expect(card).not.toBeNull();
