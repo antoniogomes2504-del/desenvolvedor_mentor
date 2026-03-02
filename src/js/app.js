@@ -14,6 +14,33 @@ let isProcessing = false;
 let selectedProfile = 'langflow';
 let activeSystemPrompt = (typeof SYSTEM_PROMPT !== 'undefined') ? SYSTEM_PROMPT : '';
 
+// ── TOKENS & CUSTOS ───────────────────────────────────────────
+let totalTokens = 0;
+let totalCostUSD = 0;
+
+const PRICING = {
+    // USD por 1 milhão de tokens (média entre input e output)
+    'gemini-2.5-flash': 0.10,
+    'gemini-2.5-pro': 1.25,
+    'gemini-2.5-flash-lite': 0.07,
+    'gemini-3-flash-preview': 0.10,
+    'gpt-4o': 5.00,
+    'gpt-4o-mini': 0.15,
+    'gpt-4-turbo': 10.00,
+    'claude-3-5-sonnet-20241022': 3.00,
+    'claude-3-5-haiku-20241022': 0.25,
+    'claude-3-opus-20240229': 15.00,
+    'deepseek-chat': 0.14,
+    'deepseek-reasoner': 0.14,
+    'mistral-large-latest': 2.00,
+    'mistral-medium-latest': 2.70,
+    'open-mistral-7b': 0.25,
+    'llama-3.3-70b-versatile': 0.60,
+    'llama-3.1-8b-instant': 0.05,
+    'mixtral-8x7b-32768': 0.24,
+    'default': 0.50
+};
+
 // ── ELEMENTOS ─────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
@@ -51,6 +78,9 @@ const customPromptInput = $('custom-prompt-input');
 const activeProfilePill = $('active-profile-pill');
 const activeProfileIcon = $('active-profile-icon');
 const activeProfileName = $('active-profile-name');
+const tokenPill = $('token-pill');
+const tokenCountEl = $('token-count');
+const tokenCostEl = $('token-cost');
 
 // ═══════════════════════════════════════════════════════════════
 // SETUP — GERAÇÃO DINÂMICA DOS CARDS DE PERFIL
@@ -214,6 +244,12 @@ btnStart.addEventListener('click', () => {
         activeProfilePill.style.display = 'flex';
     }
 
+    // Tokens
+    if (tokenPill) {
+        tokenPill.style.display = 'flex';
+        updateTokenUI();
+    }
+
     chatPanelHdr.textContent = profileLabel
         ? `💬 Chat · ${profileLabel} · ${p.name}`
         : `💬 Chat · ${p.name}`;
@@ -352,7 +388,17 @@ async function sendMessage() {
     const thinkingId = addThinkingBubble();
 
     try {
-        const reply = await callProvider();
+        const result = await callProvider();
+        const reply = result.text;
+        const usage = result.usage;
+
+        if (usage) {
+            totalTokens += usage;
+            const rate = PRICING[selectedModel] || PRICING.default;
+            totalCostUSD += (usage / 1_000_000) * rate;
+            updateTokenUI();
+        }
+
         conversationHistory.push(buildAssistantMsg(reply));
         removeThinkingBubble(thinkingId);
         addMessage('ai', reply);
@@ -440,7 +486,9 @@ async function callGemini() {
         throw new Error(e?.error?.message || `HTTP ${res.status}`);
     }
     const data = await res.json();
-    return data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.';
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.';
+    const usage = data?.usageMetadata?.totalTokenCount || 0;
+    return { text, usage };
 }
 
 async function callOpenAICompat(endpoint) {
@@ -472,7 +520,9 @@ async function callOpenAICompat(endpoint) {
         throw new Error(e?.error?.message || `HTTP ${res.status}`);
     }
     const data = await res.json();
-    return data?.choices?.[0]?.message?.content || 'Sem resposta.';
+    const text = data?.choices?.[0]?.message?.content || 'Sem resposta.';
+    const usage = data?.usage?.total_tokens || 0;
+    return { text, usage };
 }
 
 async function callClaude() {
@@ -497,7 +547,9 @@ async function callClaude() {
         throw new Error(e?.error?.message || `HTTP ${res.status}`);
     }
     const data = await res.json();
-    return data?.content?.[0]?.text || 'Sem resposta.';
+    const text = data?.content?.[0]?.text || 'Sem resposta.';
+    const usage = (data?.usage?.input_tokens || 0) + (data?.usage?.output_tokens || 0);
+    return { text, usage };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -601,6 +653,11 @@ function resetChat() {
       Vejo o que você está fazendo e te oriento passo a passo.</p>
     </div>
   `;
+}
+
+function updateTokenUI() {
+    if (tokenCountEl) tokenCountEl.textContent = totalTokens.toLocaleString('pt-BR');
+    if (tokenCostEl) tokenCostEl.textContent = totalCostUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 }
 
 // ═══════════════════════════════════════════════════════════════
